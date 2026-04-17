@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>你正在靠近丁科升</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Noto Serif SC', serif;
+  background: black;
+  color: white;
+  overflow: hidden;
+}
+
+/* 开场 */
+#intro {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: black;
+}
+
+#intro p {
+  font-size: 22px;
+  opacity: 0;
+  animation: fadeIn 3s forwards;
+}
+
+#intro button {
+  margin-top: 40px;
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid white;
+  color: white;
+  cursor: pointer;
+}
+
+/* 测试 */
+#app {
+  display: none;
+  padding: 30px;
+  text-align: center;
+}
+
+#question {
+  font-size: 20px;
+  margin-bottom: 30px;
+  animation: fadeUp 0.8s;
+}
+
+button.option {
+  display: block;
+  width: 100%;
+  margin: 12px 0;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button.option:hover {
+  transform: translateY(-3px);
+  background: rgba(255,255,255,0.2);
+}
+
+/* 结果页 */
+#result {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+}
+
+#result img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 40px;
+  background: linear-gradient(transparent, black);
+}
+
+#overlay h2 {
+  margin: 0;
+  font-size: 26px;
+}
+
+#overlay p {
+  margin-top: 15px;
+  line-height: 1.8;
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  to {opacity: 1;}
+}
+
+@keyframes fadeUp {
+  from {opacity:0; transform:translateY(20px);}
+  to {opacity:1; transform:translateY(0);}
+}
+</style>
+</head>
+
+<body>
+
+<!-- 开场 -->
+<div id="intro">
+  <p>你正在靠近丁科升</p>
+  <button onclick="start()">进入</button>
+</div>
+
+<!-- 测试 -->
+<div id="app">
+  <div id="question"></div>
+  <div id="answers"></div>
+</div>
+
+<!-- 结果 -->
+<div id="result">
+  <img id="resultImg">
+  <div id="overlay">
+    <h2 id="resultTitle"></h2>
+    <p id="resultText"></p>
+  </div>
+</div>
+
+<script>
+
+const questions = [
+{q:"秋日傍晚，你独自走在公园。",a:[["看光影","finger"],["思考问题","brain"],["想远方","arm"],["想一个人","heart"]]},
+{q:"压力来临时，你更倾向：",a:[["独自承担","nose"],["分析问题","brain"],["立刻行动","arm"],["寻找情感","heart"]]},
+{q:"深夜时，你通常：",a:[["回忆细节","finger"],["思考逻辑","brain"],["规划未来","arm"],["感受情绪","heart"]]},
+{q:"别人眼中的你：",a:[["敏感","finger"],["理性","brain"],["行动派","arm"],["温柔","heart"]]},
+{q:"你更相信：",a:[["直觉","finger"],["逻辑","brain"],["行动","arm"],["情感","heart"]]},
+{q:"面对孤独：",a:[["享受","finger"],["思考","brain"],["转移注意","arm"],["想人","heart"]]},
+{q:"你更像：",a:[["风","finger"],["机器","brain"],["路","arm"],["光","heart"]]},
+{q:"遇到问题：",a:[["感受它","finger"],["分析它","brain"],["解决它","arm"],["承受它","nose"]]},
+{q:"被误解时：",a:[["不解释","nose"],["讲逻辑","brain"],["用行动证明","arm"],["会难过","heart"]]},
+{q:"你的核心是：",a:[["细腻","finger"],["清醒","brain"],["力量","arm"],["温度","heart"]]}
+];
+
+let index = 0;
+let scores = {brain:0,nose:0,arm:0,finger:0,heart:0};
+
+function start(){
+  document.getElementById("intro").style.display="none";
+  document.getElementById("app").style.display="block";
+  showQuestion();
+}
+
+function showQuestion(){
+  let q = questions[index];
+  document.getElementById("question").innerText = q.q;
+
+  let html="";
+  q.a.forEach(ans=>{
+    html+=`<button class="option" onclick="choose('${ans[1]}')">${ans[0]}</button>`;
+  });
+
+  document.getElementById("answers").innerHTML=html;
+}
+
+function choose(type){
+  scores[type]++;
+  index++;
+
+  if(index<questions.length){
+    showQuestion();
+  }else{
+    showResult();
+  }
+}
+
+function showResult(){
+  let max = Object.keys(scores).reduce((a,b)=>scores[a]>scores[b]?a:b);
+
+  const results = {
+    brain:{
+      title:"丁科升的大脑",
+      img:"images/brain.jpg",
+      text:"你更相信逻辑。\n你习惯理解世界，而不是被它裹挟。"
+    },
+    nose:{
+      title:"丁科升的鼻梁",
+      img:"images/nose.jpg",
+      text:"你沉默，却承担重量。\n很多事情，你一个人扛住。"
+    },
+    arm:{
+      title:"丁科升的手臂",
+      img:"images/arm.jpg",
+      text:"你推动世界。\n你让事情发生。"
+    },
+    finger:{
+      title:"丁科升的手指",
+      img:"images/finger.jpg",
+      text:"你敏感而细腻。\n你感知世界最微小的变化。"
+    },
+    heart:{
+      title:"丁科升的心脏",
+      img:"images/heart.jpg",
+      text:"你温柔。\n你理解他人，也容易受伤。"
+    }
+  };
+
+  let r = results[max];
+
+  document.getElementById("app").style.display="none";
+  document.getElementById("result").style.display="block";
+
+  document.getElementById("resultImg").src = r.img;
+  document.getElementById("resultTitle").innerText = r.title;
+  document.getElementById("resultText").innerText = r.text;
+}
+
+</script>
+
+</body>
+</html>
